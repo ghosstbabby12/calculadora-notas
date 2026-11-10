@@ -1,0 +1,7 @@
+flask==3.0.3
+pytest==8.3.3
+pytest-cov==5.0.0
+requests==2.32.3
+jsonschema==4.23.0
+locust==2.31.8
+boto3==1.35.36
