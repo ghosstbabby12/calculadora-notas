@@ -1,0 +1,59 @@
+name: Publicar staging
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: read
+  packages: write
+concurrency:
+  group: publicar-staging
+  cancel-in-progress: false
+jobs:
+  publicar:
+    if: github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      REVISION: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - name: Autenticar en GHCR
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          echo "IMAGEN=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+      - name: Publicar la revisión
+        run: |
+          docker build -t "$IMAGEN:$REVISION" .
+          docker push "$IMAGEN:$REVISION"
+          docker pull "$IMAGEN:$REVISION"
+      - name: Recordar la versión estable
+        run: |
+          if docker pull "$IMAGEN:staging" > previo.log 2>&1; then
+            docker tag "$IMAGEN:staging" estable-anterior
+            echo "HAY_ESTABLE=si" >> "$GITHUB_ENV"
+          elif ! grep -Eiq 'manifest unknown|manifest_unknown|not found' previo.log; then
+            cat previo.log
+            exit 1
+          fi
+      - name: Probar la imagen publicada
+        id: humo
+        run: |
+          docker run -d --name humo -p 127.0.0.1:5000:5000 "$IMAGEN:$REVISION"
+          curl -fsS --retry 15 --retry-all-errors --retry-delay 1 http://localhost:5000/salud | jq -e '.estado == "ok"'
+      - name: Promover a staging
+        run: |
+          actual=$(git ls-remote origin refs/heads/main | cut -f1)
+          if [[ "$actual" == "$REVISION" ]]; then
+            docker tag "$IMAGEN:$REVISION" "$IMAGEN:staging"
+            docker push "$IMAGEN:staging"
+          fi
+      - name: Restaurar la etiqueta estable si falla el humo
+        if: failure() && steps.humo.outcome == 'failure' && env.HAY_ESTABLE == 'si'
+        run: |
+          docker tag estable-anterior "$IMAGEN:staging"
+          docker push "$IMAGEN:staging"

@@ -57,6 +57,7 @@ def calcular_definitiva(m1, m2, m3):
 
 def determinar_estado(definitiva):
     """Devuelve el estado académico según la nota definitiva."""
+    definitiva = validar_nota(definitiva)
     if definitiva < LIMITE_HABILITA:
         return ESTADO_REPROBADO
     if definitiva < LIMITE_APROBADO:
