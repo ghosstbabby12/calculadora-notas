@@ -1,9 +1,36 @@
 """Contratos JSON (JSON Schema) de las respuestas de la API.
 
-Persona B los usa en tests/api para validar que la API cumple el contrato
-acordado con el equipo. Persona C los puede reutilizar en el pipeline.
+Unifica los contratos de Persona B (enunciado: m1/m2/m3, /health) y
+Persona C (momento1/2/3, /salud, exportación a S3). Ambos estilos son
+válidos; la API acepta los dos.
 """
 
+
+def _objeto(campo_tipos):
+    return {
+        "type": "object",
+        "properties": campo_tipos,
+        "required": list(campo_tipos),
+        "additionalProperties": False,
+    }
+
+
+TEXTO = {"type": "string", "minLength": 1}
+ID = {"type": "integer", "minimum": 1}
+RESUMEN = {
+    "definitiva": {"type": "number", "minimum": 0.0, "maximum": 5.0},
+    "estado": {"type": "string", "enum": ["APROBADO", "HABILITA", "REPROBADO"]},
+}
+
+# --- Contratos estrictos (Persona C, additionalProperties False) ---
+ESTUDIANTE = _objeto({"id": ID, "nombre": TEXTO, "codigo": TEXTO})
+NOTAS = _objeto({"id": ID, **RESUMEN})
+PROMEDIO = _objeto({"id": ID, "nombre": TEXTO, **RESUMEN})
+ERROR = _objeto({"error": TEXTO})
+SALUD = _objeto({"estado": {"const": "ok"}})
+REPORTE = _objeto({"bucket": TEXTO, "archivo": TEXTO})
+
+# --- Aliases compatibles (Persona B, additionalProperties True) ---
 ESTUDIANTE_CREACION = {
     "type": "object",
     "required": ["id", "nombre"],
@@ -26,23 +53,29 @@ NOTAS_REGISTRO = {
     "additionalProperties": True,
 }
 
-# GET /promedio devuelve exactamente lo mismo que POST /notas.
-PROMEDIO_RESPUESTA = NOTAS_REGISTRO
+# GET /promedio devuelve id, nombre, definitiva y estado.
+PROMEDIO_RESPUESTA = {
+    "type": "object",
+    "required": ["id", "definitiva", "estado"],
+    "properties": {
+        "id": {"type": "integer", "minimum": 1},
+        "nombre": {"type": "string", "minLength": 1},
+        "definitiva": {"type": "number", "minimum": 0.0, "maximum": 5.0},
+        "estado": {"type": "string", "enum": ["APROBADO", "HABILITA", "REPROBADO"]},
+    },
+    "additionalProperties": True,
+}
 
 ERROR_RESPUESTA = {
     "type": "object",
     "required": ["error"],
-    "properties": {
-        "error": {"type": "string", "minLength": 1},
-    },
+    "properties": {"error": {"type": "string", "minLength": 1}},
     "additionalProperties": True,
 }
 
 HEALTH_RESPUESTA = {
     "type": "object",
     "required": ["status"],
-    "properties": {
-        "status": {"type": "string", "const": "ok"},
-    },
+    "properties": {"status": {"type": "string", "const": "ok"}},
     "additionalProperties": True,
 }
