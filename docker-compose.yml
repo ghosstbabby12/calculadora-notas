@@ -1,0 +1,42 @@
+services:
+  api:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      AWS_ENDPOINT_URL: http://localstack:4566
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: us-east-1
+    depends_on:
+      localstack:
+        condition: service_started
+    networks:
+      - notas-net
+
+  # Ejecuta solo las pruebas de API contra el servicio `api`.
+  # Uso: docker compose run --rm test-runner
+  # --no-cov: la cobertura se mide en unit (test_client), aquí solo se valida el contrato.
+  test-runner:
+    build: .
+    command: pytest tests/api -v --no-cov
+    environment:
+      API_BASE_URL: http://api:5000
+    depends_on:
+      api:
+        condition: service_started
+    networks:
+      - notas-net
+
+  localstack:
+    image: localstack/localstack:4.0.3
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: s3
+    networks:
+      - notas-net
+
+networks:
+  notas-net:
+    driver: bridge
