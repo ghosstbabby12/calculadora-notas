@@ -46,7 +46,7 @@ def crear_app(cliente_s3=None):
                 definitiva = calcular_definitiva(*(datos.get(f"momento{i}") for i in (1, 2, 3)))
             except (TypeError, ValueError) as error:
                 return jsonify(error=str(error)), 400
-            resumen = dict(definitiva=definitiva, estado=determinar_estado(definitiva))
+            resumen = {"definitiva": definitiva, "estado": determinar_estado(definitiva)}
             estudiantes[identificador].update(resumen)
         return jsonify(id=identificador, **resumen), 201
 
