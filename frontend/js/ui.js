@@ -4,6 +4,7 @@
  * Regla de seguridad: los datos del usuario o de la API se escriben SIEMPRE
  * con textContent o createElement, nunca con innerHTML (evita XSS).
  */
+import { crearMedidor } from "./graficos.js";
 
 const ESTADOS = {
   APROBADO: { clase: "resultado--aprobado", icono: "✔" },
@@ -134,6 +135,9 @@ export function mostrarResultado(tarjeta, resultado, desglose) {
   const definitiva = resultado.definitiva.toFixed(2);
   tarjeta.querySelector('[data-testid="resultado-definitiva"]').textContent = definitiva;
   tarjeta.querySelector(".desglose__total").textContent = definitiva;
+  tarjeta
+    .querySelector('[data-testid="resultado-medidor"]')
+    .replaceChildren(crearMedidor(resultado.definitiva));
   pintarDesglose(tarjeta, desglose);
   tarjeta.hidden = false;
 }

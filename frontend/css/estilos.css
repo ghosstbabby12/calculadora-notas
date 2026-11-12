@@ -412,3 +412,523 @@ input[aria-invalid="true"] {
     justify-self: stretch;
   }
 }
+
+/* ==========================================================================
+   Pestañas y vistas (Operación / Panel técnico)
+   ========================================================================== */
+.principal {
+  margin: 0;
+}
+
+.pestanas {
+  max-width: 1100px;
+  margin: 1rem auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pestana {
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgb(255 255 255 / 10%);
+  border: 1px solid rgb(255 255 255 / 30%);
+  padding: 0.45rem 1.05rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.pestana:hover {
+  background: rgb(255 255 255 / 20%);
+}
+
+.pestana[aria-selected="true"] {
+  background: #fff;
+  color: var(--color-primario);
+  border-color: #fff;
+}
+
+.pestana:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Panel técnico
+   ========================================================================== */
+.contenedor--tecnico {
+  grid-template-columns: 1fr;
+}
+
+.rejilla-doble {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+}
+
+.tarjeta--guion {
+  border-left: 6px solid var(--color-acento);
+}
+
+.guion {
+  margin: 0;
+  padding-left: 1.3rem;
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.92rem;
+}
+
+.ayuda code,
+.nota code,
+.tabla-tecnica code,
+.decisiones code,
+.guion code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.86em;
+  background: #eef1f6;
+  padding: 0.05rem 0.3rem;
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+
+.nota {
+  margin: 0.9rem 0 0;
+  padding: 0.6rem 0.85rem;
+  background: #f7f9fc;
+  border-left: 4px solid var(--color-borde);
+  border-radius: 6px;
+  font-size: 0.86rem;
+  color: var(--color-texto-suave);
+}
+
+/* --- Flujo de arquitectura ------------------------------------------------ */
+.flujo {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.flujo__nodo {
+  position: relative;
+  flex: 1 1 150px;
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.7rem 0.8rem;
+  background: #f7f9fc;
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+}
+
+.flujo__nodo + .flujo__nodo::before {
+  content: "→";
+  position: absolute;
+  left: -0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-acento);
+  font-weight: 700;
+}
+
+.flujo__etiqueta {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--color-primario);
+}
+
+.flujo__detalle {
+  font-size: 0.78rem;
+  color: var(--color-texto-suave);
+}
+
+.diagnostico {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* --- Chips y acciones ------------------------------------------------------ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: var(--color-info-fondo);
+  color: var(--color-info);
+  font-size: 0.84rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip[data-estado="ok"] {
+  background: var(--color-aprobado-fondo);
+  color: var(--color-aprobado);
+}
+
+.chip[data-estado="error"] {
+  background: var(--color-reprobado-fondo);
+  color: var(--color-reprobado);
+}
+
+.chip[data-estado="neutro"] {
+  background: #eef1f6;
+  color: var(--color-texto-suave);
+}
+
+.chip--suave {
+  background: #eef1f6;
+  color: var(--color-texto-suave);
+  font-weight: 500;
+}
+
+.chip--boton {
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fff;
+  color: var(--color-primario);
+  border-color: var(--color-borde);
+}
+
+.chip--boton:hover {
+  border-color: var(--color-acento);
+  background: var(--color-info-fondo);
+}
+
+.atajos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.9rem;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+/* --- Formularios técnicos -------------------------------------------------- */
+.contrato__formulario {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 0.75rem;
+  align-items: end;
+  margin-bottom: 0.75rem;
+}
+
+.campo--angosto input,
+.campo--angosto select {
+  max-width: 160px;
+}
+
+textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--color-texto);
+  resize: vertical;
+}
+
+textarea:disabled {
+  background: #f1f3f7;
+  color: var(--color-texto-suave);
+}
+
+textarea:focus-visible {
+  outline: 3px solid var(--color-acento);
+  outline-offset: 2px;
+}
+
+/* --- Respuesta del contrato ------------------------------------------------ */
+.contrato__respuesta {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.contrato__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.codigo {
+  margin: 0;
+  padding: 0.8rem;
+  max-height: 320px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #0f1b2d;
+  color: #d7e3f4;
+  border-radius: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+/* --- Tablas técnicas -------------------------------------------------------- */
+.tabla-desplazable {
+  overflow-x: auto;
+  margin-top: 0.75rem;
+}
+
+.tabla-tecnica {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.tabla-tecnica caption {
+  text-align: left;
+  color: var(--color-texto-suave);
+  font-size: 0.82rem;
+  padding-bottom: 0.4rem;
+}
+
+.tabla-tecnica th,
+.tabla-tecnica td {
+  padding: 0.5rem 0.55rem;
+  border-bottom: 1px solid var(--color-borde);
+  text-align: left;
+  vertical-align: top;
+}
+
+.tabla-tecnica thead th {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-texto-suave);
+}
+
+.tabla-tecnica tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla-tecnica .numero {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.fila-ok td:last-child {
+  color: var(--color-aprobado);
+  font-weight: 700;
+}
+
+.fila-falla td:last-child {
+  color: var(--color-reprobado);
+  font-weight: 700;
+}
+
+/* --- Laboratorio de carga ---------------------------------------------------- */
+.carga__progreso {
+  margin-top: 1rem;
+}
+
+.barra {
+  height: 10px;
+  background: #e6eaf1;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.barra__relleno {
+  height: 100%;
+  width: 0;
+  background: var(--color-acento);
+  transition: width 0.4s ease;
+}
+
+.carga__estado {
+  margin: 0.4rem 0 0;
+  font-size: 0.88rem;
+  color: var(--color-texto-suave);
+}
+
+.kpis {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  margin-top: 1rem;
+}
+
+.kpi {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.7rem 0.8rem;
+  background: #f7f9fc;
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+}
+
+.kpi__valor {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-primario);
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi__etiqueta {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-texto-suave);
+}
+
+.veredicto {
+  margin-top: 1rem;
+  padding: 0.7rem 0.9rem;
+  border-left: 4px solid currentcolor;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.veredicto--ok {
+  color: var(--color-aprobado);
+  background: var(--color-aprobado-fondo);
+}
+
+.veredicto--falla {
+  color: var(--color-reprobado);
+  background: var(--color-reprobado-fondo);
+}
+
+.figura {
+  margin: 1rem 0 0;
+}
+
+.grafico {
+  width: 100%;
+  height: 240px;
+  display: block;
+  background: #fff;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+}
+
+.figura figcaption {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--color-texto-suave);
+}
+
+/* --- Decisiones técnicas ------------------------------------------------------ */
+.decisiones {
+  margin: 0;
+}
+
+.decisiones dt {
+  font-weight: 700;
+  margin-top: 0.8rem;
+}
+
+.decisiones dt:first-child {
+  margin-top: 0;
+}
+
+.decisiones dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: var(--color-texto-suave);
+}
+
+/* --- Medidor de la tarjeta de resultado -------------------------------------- */
+.medidor {
+  margin: 0.75rem 0 0.35rem;
+}
+
+.medidor__escala {
+  position: relative;
+  display: flex;
+  height: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.medidor__zona--reprobado { background: var(--color-reprobado); }
+.medidor__zona--habilita { background: var(--color-habilita); }
+.medidor__zona--aprobado { background: var(--color-aprobado); }
+
+.medidor__marcador {
+  position: absolute;
+  top: -4px;
+  width: 3px;
+  height: 22px;
+  background: var(--color-texto);
+  border-radius: 2px;
+  transform: translateX(-1.5px);
+}
+
+.medidor__ticks {
+  position: relative;
+  height: 1rem;
+  margin-top: 0.15rem;
+  font-size: 0.7rem;
+  color: var(--color-texto-suave);
+}
+
+.medidor__tick {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+/* --- Pie ---------------------------------------------------------------------- */
+.pie__fino {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+/* --- Adaptación a pantallas pequeñas ----------------------------------------- */
+@media (max-width: 720px) {
+  .contrato__formulario {
+    grid-template-columns: 1fr;
+  }
+
+  .campo--angosto input,
+  .campo--angosto select {
+    max-width: none;
+  }
+
+  .flujo {
+    flex-direction: column;
+  }
+
+  .flujo__nodo + .flujo__nodo::before {
+    content: "↓";
+    left: 50%;
+    top: -0.85rem;
+    transform: translateX(-50%);
+  }
+}
+
+/* Los elementos de la rejilla no deben crecer por un hijo ancho (tablas o
+   bloques de código): sin min-width:0, el navegador usa el min-content. */
+.contenedor > * {
+  min-width: 0;
+}
+
+.tabla-desplazable {
+  max-width: 100%;
+}
+
+.tarjeta {
+  overflow-wrap: anywhere;
+}

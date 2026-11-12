@@ -3,6 +3,7 @@
  */
 import * as api from "./api.js";
 import * as ui from "./ui.js";
+import { iniciarPanelTecnico } from "./tecnico.js";
 
 // Solo para MOSTRAR el desglose. El cálculo oficial lo hace el backend.
 const PESOS = { 1: 0.3, 2: 0.3, 3: 0.4 };
@@ -149,4 +150,5 @@ iniciarFormularioEstudiante();
 iniciarFormularioNotas();
 iniciarFormularioConsulta();
 iniciarExportacion();
+iniciarPanelTecnico();
 verificarServidor();
