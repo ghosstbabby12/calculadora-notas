@@ -2,6 +2,9 @@ name: CI
 on: [push, pull_request, workflow_dispatch]
 permissions:
   contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   pruebas:
@@ -26,7 +29,12 @@ jobs:
   sonar:
     needs: pruebas
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    # Los PR de forks no reciben SONAR_TOKEN: se omite el análisis en vez de
+    # dejar el check en rojo por un fallo de configuración ajeno al cambio.
+    if: >-
+      github.ref == 'refs/heads/main' ||
+      (github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository)
     steps:
       - uses: actions/checkout@v4
         with:
