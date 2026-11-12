@@ -225,6 +225,31 @@ def test_determinar_estado_segun_definitiva(definitiva, estado_esperado):
     assert estado == estado_esperado
 
 
+@pytest.mark.parametrize(
+    "definitiva, excepcion",
+    [
+        (-0.1, ValueError),
+        (5.1, ValueError),
+        (None, TypeError),
+        ("3.0", TypeError),
+        (True, TypeError),
+    ],
+    ids=[
+        "BVA-justo-debajo-de-0.0",
+        "BVA-justo-encima-de-5.0",
+        "CI3-None",
+        "CI4-texto-numerico",
+        "CI5-booleano",
+    ],
+)
+def test_determinar_estado_rechaza_definitiva_invalida(definitiva, excepcion):
+    # Arrange: la definitiva inválida y la excepción esperada llegan por parametrize
+
+    # Act / Assert
+    with pytest.raises(excepcion):
+        determinar_estado(definitiva)
+
+
 # ---------------------------------------------------------------------------
 # Flujo completo: notas -> definitiva -> estado
 # ---------------------------------------------------------------------------
