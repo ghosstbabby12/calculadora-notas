@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Calculadora de Notas</title>
+  <title>Calculadora de Notas · Panel técnico</title>
   <link rel="stylesheet" href="css/estilos.css">
   <script type="module" src="js/app.js"></script>
 </head>
@@ -19,115 +19,378 @@
         <span class="estado-servidor__texto">Verificando servidor…</span>
       </p>
     </div>
+    <nav class="pestanas" aria-label="Vistas de la aplicación">
+      <button type="button" class="pestana" role="tab" aria-selected="true"
+              aria-controls="vista-operacion" id="pestana-operacion"
+              data-vista="operacion" data-testid="pestana-operacion">Operación</button>
+      <button type="button" class="pestana" role="tab" aria-selected="false"
+              aria-controls="vista-tecnico" id="pestana-tecnico"
+              data-vista="tecnico" data-testid="pestana-tecnico">Panel técnico</button>
+    </nav>
   </header>
 
-  <main class="contenedor">
-    <!-- 1. Registrar estudiante -->
-    <section class="tarjeta" aria-labelledby="titulo-estudiante">
-      <h2 id="titulo-estudiante" class="tarjeta__titulo"><span class="paso">1</span> Registrar estudiante</h2>
-      <form id="form-estudiante" class="formulario" novalidate>
-        <div class="campo">
-          <label for="nombre">Nombre</label>
-          <input id="nombre" name="nombre" type="text" autocomplete="off" required data-testid="input-nombre">
-        </div>
-        <div class="campo">
-          <label for="codigo">Código</label>
-          <input id="codigo" name="codigo" type="text" autocomplete="off" required data-testid="input-codigo">
-        </div>
-        <button type="submit" class="boton" data-testid="btn-crear-estudiante">Registrar estudiante</button>
-      </form>
-      <p class="mensaje" data-testid="mensaje-estudiante" role="status" aria-live="polite" hidden></p>
+  <main class="principal">
+    <!-- ==================================================================
+         Vista 1: operación (la que usa un usuario normal)
+         ================================================================== -->
+    <section id="vista-operacion" class="vista" role="tabpanel" aria-labelledby="pestana-operacion">
+      <div class="contenedor">
+        <!-- 1. Registrar estudiante -->
+        <section class="tarjeta" aria-labelledby="titulo-estudiante">
+          <h2 id="titulo-estudiante" class="tarjeta__titulo"><span class="paso">1</span> Registrar estudiante</h2>
+          <form id="form-estudiante" class="formulario" novalidate>
+            <div class="campo">
+              <label for="nombre">Nombre</label>
+              <input id="nombre" name="nombre" type="text" autocomplete="off" required data-testid="input-nombre">
+            </div>
+            <div class="campo">
+              <label for="codigo">Código</label>
+              <input id="codigo" name="codigo" type="text" autocomplete="off" required data-testid="input-codigo">
+            </div>
+            <button type="submit" class="boton" data-testid="btn-crear-estudiante">Registrar estudiante</button>
+          </form>
+          <p class="mensaje" data-testid="mensaje-estudiante" role="status" aria-live="polite" hidden></p>
 
-      <h3 class="subtitulo">Estudiantes de esta sesión</h3>
-      <p class="vacio" id="lista-vacia">Aún no has registrado estudiantes.</p>
-      <ul class="lista-estudiantes" id="lista-estudiantes" data-testid="lista-estudiantes"></ul>
+          <h3 class="subtitulo">Estudiantes de esta sesión</h3>
+          <p class="vacio" id="lista-vacia">Aún no has registrado estudiantes.</p>
+          <ul class="lista-estudiantes" id="lista-estudiantes" data-testid="lista-estudiantes"></ul>
+        </section>
+
+        <!-- 2. Registrar notas -->
+        <section class="tarjeta" aria-labelledby="titulo-notas">
+          <h2 id="titulo-notas" class="tarjeta__titulo"><span class="paso">2</span> Registrar notas</h2>
+          <form id="form-notas" class="formulario" novalidate>
+            <div class="campo">
+              <label for="estudiante-notas">Estudiante</label>
+              <select id="estudiante-notas" name="estudiante" required data-testid="select-estudiante">
+                <option value="">Selecciona un estudiante…</option>
+              </select>
+            </div>
+            <div class="fila-notas">
+              <div class="campo">
+                <label for="momento1">Momento 1 <small>(30 %)</small></label>
+                <input id="momento1" name="momento1" type="number" min="0" max="5" step="0.1"
+                       inputmode="decimal" aria-describedby="error-momento1" data-testid="input-momento1">
+                <p id="error-momento1" class="error-campo" hidden></p>
+              </div>
+              <div class="campo">
+                <label for="momento2">Momento 2 <small>(30 %)</small></label>
+                <input id="momento2" name="momento2" type="number" min="0" max="5" step="0.1"
+                       inputmode="decimal" aria-describedby="error-momento2" data-testid="input-momento2">
+                <p id="error-momento2" class="error-campo" hidden></p>
+              </div>
+              <div class="campo">
+                <label for="momento3">Momento 3 <small>(40 %)</small></label>
+                <input id="momento3" name="momento3" type="number" min="0" max="5" step="0.1"
+                       inputmode="decimal" aria-describedby="error-momento3" data-testid="input-momento3">
+                <p id="error-momento3" class="error-campo" hidden></p>
+              </div>
+            </div>
+            <button type="submit" class="boton" data-testid="btn-registrar-notas">Registrar notas</button>
+          </form>
+          <p class="mensaje" data-testid="mensaje-notas" role="status" aria-live="polite" hidden></p>
+        </section>
+
+        <!-- 3. Consultar resultado -->
+        <section class="tarjeta" aria-labelledby="titulo-consulta">
+          <h2 id="titulo-consulta" class="tarjeta__titulo"><span class="paso">3</span> Consultar resultado</h2>
+          <form id="form-consulta" class="formulario formulario--en-linea" novalidate>
+            <div class="campo">
+              <label for="id-consulta">Id del estudiante</label>
+              <input id="id-consulta" name="id" type="number" min="1" step="1" inputmode="numeric" data-testid="input-id-consulta">
+            </div>
+            <button type="submit" class="boton" data-testid="btn-consultar">Consultar</button>
+          </form>
+          <p class="mensaje" data-testid="mensaje-consulta" role="status" aria-live="polite" hidden></p>
+
+          <article class="resultado" data-testid="resultado" hidden>
+            <header class="resultado__encabezado">
+              <h3 class="resultado__nombre" data-testid="resultado-nombre"></h3>
+              <p class="insignia" data-testid="resultado-estado">
+                <span class="insignia__icono" aria-hidden="true"></span>
+                <span class="insignia__texto"></span>
+              </p>
+            </header>
+            <div class="medidor" data-testid="resultado-medidor" aria-hidden="true"></div>
+            <p class="resultado__definitiva">
+              Definitiva: <strong data-testid="resultado-definitiva"></strong>
+            </p>
+            <table class="desglose" data-testid="resultado-desglose">
+              <caption>Desglose del cálculo</caption>
+              <thead>
+                <tr><th scope="col">Momento</th><th scope="col">Nota</th><th scope="col">Peso</th><th scope="col">Aporte</th></tr>
+              </thead>
+              <tbody></tbody>
+              <tfoot>
+                <tr><th scope="row" colspan="3">Definitiva (redondeada a 2 decimales)</th><td class="desglose__total"></td></tr>
+              </tfoot>
+            </table>
+            <p class="vacio" data-testid="desglose-no-disponible" hidden>
+              El desglose solo está disponible para notas registradas en esta sesión del navegador.
+            </p>
+          </article>
+        </section>
+
+        <!-- 4. Exportar reporte -->
+        <section class="tarjeta" aria-labelledby="titulo-exportar">
+          <h2 id="titulo-exportar" class="tarjeta__titulo"><span class="paso">4</span> Exportar reporte</h2>
+          <p class="ayuda">Genera un CSV con los estudiantes que tienen notas y lo sube al bucket S3 (LocalStack).</p>
+          <button type="button" class="boton boton--secundario" id="btn-exportar" data-testid="btn-exportar">Exportar a S3</button>
+          <p class="mensaje" data-testid="mensaje-exportar" role="status" aria-live="polite" hidden></p>
+        </section>
+      </div>
     </section>
 
-    <!-- 2. Registrar notas -->
-    <section class="tarjeta" aria-labelledby="titulo-notas">
-      <h2 id="titulo-notas" class="tarjeta__titulo"><span class="paso">2</span> Registrar notas</h2>
-      <form id="form-notas" class="formulario" novalidate>
-        <div class="campo">
-          <label for="estudiante-notas">Estudiante</label>
-          <select id="estudiante-notas" name="estudiante" required data-testid="select-estudiante">
-            <option value="">Selecciona un estudiante…</option>
-          </select>
-        </div>
-        <div class="fila-notas">
-          <div class="campo">
-            <label for="momento1">Momento 1 <small>(30 %)</small></label>
-            <input id="momento1" name="momento1" type="number" min="0" max="5" step="0.1"
-                   inputmode="decimal" aria-describedby="error-momento1" data-testid="input-momento1">
-            <p id="error-momento1" class="error-campo" hidden></p>
-          </div>
-          <div class="campo">
-            <label for="momento2">Momento 2 <small>(30 %)</small></label>
-            <input id="momento2" name="momento2" type="number" min="0" max="5" step="0.1"
-                   inputmode="decimal" aria-describedby="error-momento2" data-testid="input-momento2">
-            <p id="error-momento2" class="error-campo" hidden></p>
-          </div>
-          <div class="campo">
-            <label for="momento3">Momento 3 <small>(40 %)</small></label>
-            <input id="momento3" name="momento3" type="number" min="0" max="5" step="0.1"
-                   inputmode="decimal" aria-describedby="error-momento3" data-testid="input-momento3">
-            <p id="error-momento3" class="error-campo" hidden></p>
-          </div>
-        </div>
-        <button type="submit" class="boton" data-testid="btn-registrar-notas">Registrar notas</button>
-      </form>
-      <p class="mensaje" data-testid="mensaje-notas" role="status" aria-live="polite" hidden></p>
-    </section>
+    <!-- ==================================================================
+         Vista 2: panel técnico para la sustentación
+         ================================================================== -->
+    <section id="vista-tecnico" class="vista" role="tabpanel" aria-labelledby="pestana-tecnico" hidden>
+      <div class="contenedor contenedor--tecnico">
 
-    <!-- 3. Consultar resultado -->
-    <section class="tarjeta" aria-labelledby="titulo-consulta">
-      <h2 id="titulo-consulta" class="tarjeta__titulo"><span class="paso">3</span> Consultar resultado</h2>
-      <form id="form-consulta" class="formulario formulario--en-linea" novalidate>
-        <div class="campo">
-          <label for="id-consulta">Id del estudiante</label>
-          <input id="id-consulta" name="id" type="number" min="1" step="1" inputmode="numeric" data-testid="input-id-consulta">
-        </div>
-        <button type="submit" class="boton" data-testid="btn-consultar">Consultar</button>
-      </form>
-      <p class="mensaje" data-testid="mensaje-consulta" role="status" aria-live="polite" hidden></p>
+        <!-- Guion sugerido -->
+        <section class="tarjeta tarjeta--guion">
+          <h2 class="tarjeta__titulo"><span class="paso">i</span> Guion sugerido para la sustentación</h2>
+          <ol class="guion">
+            <li><strong>Operación:</strong> registra un estudiante, notas 1.6 / 1.7 / 5.0 y muestra la definitiva 2.99.</li>
+            <li><strong>Arquitectura:</strong> sigue el recorrido navegador → Nginx → Gunicorn → calculadora → S3.</li>
+            <li><strong>Contrato:</strong> consulta <code>/salud</code> y provoca un <code>400</code> con una nota 5.1.</li>
+            <li><strong>Valores límite:</strong> ejecuta la batería BVA y explica 1.99 contra 2.00.</li>
+            <li><strong>Carga:</strong> corre 50 usuarios durante 20 s y lee el p95 frente al umbral de 800 ms.</li>
+          </ol>
+        </section>
 
-      <article class="resultado" data-testid="resultado" hidden>
-        <header class="resultado__encabezado">
-          <h3 class="resultado__nombre" data-testid="resultado-nombre"></h3>
-          <p class="insignia" data-testid="resultado-estado">
-            <span class="insignia__icono" aria-hidden="true"></span>
-            <span class="insignia__texto"></span>
+        <!-- 1. Arquitectura -->
+        <section class="tarjeta" aria-labelledby="titulo-arquitectura">
+          <h2 id="titulo-arquitectura" class="tarjeta__titulo"><span class="paso">1</span> Arquitectura viva</h2>
+          <p class="ayuda">
+            El navegador nunca conoce la URL interna de la API: pide todo a Nginx, que reenvía
+            <code>/api/*</code> al backend. Cada caja es un contenedor de Docker Compose.
           </p>
-        </header>
-        <p class="resultado__definitiva">
-          Definitiva: <strong data-testid="resultado-definitiva"></strong>
-        </p>
-        <table class="desglose" data-testid="resultado-desglose">
-          <caption>Desglose del cálculo</caption>
-          <thead>
-            <tr><th scope="col">Momento</th><th scope="col">Nota</th><th scope="col">Peso</th><th scope="col">Aporte</th></tr>
-          </thead>
-          <tbody></tbody>
-          <tfoot>
-            <tr><th scope="row" colspan="3">Definitiva (redondeada a 2 decimales)</th><td class="desglose__total"></td></tr>
-          </tfoot>
-        </table>
-        <p class="vacio" data-testid="desglose-no-disponible" hidden>
-          El desglose solo está disponible para notas registradas en esta sesión del navegador.
-        </p>
-      </article>
-    </section>
+          <ol class="flujo">
+            <li class="flujo__nodo">
+              <span class="flujo__etiqueta">Navegador</span>
+              <span class="flujo__detalle">HTML + JS (fetch)</span>
+            </li>
+            <li class="flujo__nodo">
+              <span class="flujo__etiqueta">Nginx</span>
+              <span class="flujo__detalle">:8080 · proxy <code>/api</code></span>
+            </li>
+            <li class="flujo__nodo">
+              <span class="flujo__etiqueta">Gunicorn</span>
+              <span class="flujo__detalle">:5000 · 1 worker, 8 hilos</span>
+            </li>
+            <li class="flujo__nodo">
+              <span class="flujo__etiqueta">calculadora.py</span>
+              <span class="flujo__detalle">pesos 30 / 30 / 40</span>
+            </li>
+            <li class="flujo__nodo">
+              <span class="flujo__etiqueta">LocalStack S3</span>
+              <span class="flujo__detalle">:4566 · reporte CSV</span>
+            </li>
+          </ol>
+          <div class="diagnostico">
+            <button type="button" class="boton boton--secundario" data-testid="btn-verificar-arquitectura">
+              Verificar servicios
+            </button>
+            <span class="chip" data-testid="chip-api" data-estado="verificando">API: verificando…</span>
+            <span class="chip" data-testid="chip-latencia">Latencia: —</span>
+            <span class="chip chip--suave">S3 se comprueba al exportar</span>
+          </div>
+          <p class="nota">
+            <strong>Por qué importa:</strong> Nginx sirve archivos estáticos y enmascara la API;
+            Gunicorn reemplazó al servidor de desarrollo de Flask, que se quedaba sin conexiones
+            a partir de 800 usuarios (ver <code>load/informe.md</code>).
+          </p>
+        </section>
 
-    <!-- 4. Exportar reporte -->
-    <section class="tarjeta" aria-labelledby="titulo-exportar">
-      <h2 id="titulo-exportar" class="tarjeta__titulo"><span class="paso">4</span> Exportar reporte</h2>
-      <p class="ayuda">Genera un CSV con los estudiantes que tienen notas y lo sube al bucket S3 (LocalStack).</p>
-      <button type="button" class="boton boton--secundario" id="btn-exportar" data-testid="btn-exportar">Exportar a S3</button>
-      <p class="mensaje" data-testid="mensaje-exportar" role="status" aria-live="polite" hidden></p>
+        <!-- 2. Contrato de la API -->
+        <section class="tarjeta" aria-labelledby="titulo-contrato">
+          <h2 id="titulo-contrato" class="tarjeta__titulo"><span class="paso">2</span> Contrato de la API</h2>
+          <p class="ayuda">
+            Envía peticiones reales y observa método, código de estado y latencia. Es el mismo
+            contrato que validan <code>tests/api/test_api.py</code> y <code>tests/api/schemas.py</code>.
+          </p>
+          <div class="atajos" role="group" aria-label="Rutas de ejemplo">
+            <button type="button" class="chip chip--boton" data-metodo="GET" data-ruta="/salud" data-cuerpo="">GET /salud</button>
+            <button type="button" class="chip chip--boton" data-metodo="POST" data-ruta="/estudiantes"
+                    data-cuerpo='{"nombre":"Ana","codigo":"A01"}'>POST /estudiantes</button>
+            <button type="button" class="chip chip--boton" data-metodo="POST" data-ruta="/estudiantes/1/notas"
+                    data-cuerpo='{"momento1":3,"momento2":4,"momento3":5}'>POST /notas</button>
+            <button type="button" class="chip chip--boton" data-metodo="GET" data-ruta="/estudiantes/1/promedio"
+                    data-cuerpo="">GET /promedio</button>
+            <button type="button" class="chip chip--boton" data-metodo="POST" data-ruta="/reportes/exportar"
+                    data-cuerpo="">POST /reportes/exportar</button>
+          </div>
+          <div class="contrato__formulario">
+            <div class="campo campo--angosto">
+              <label for="contrato-metodo">Método</label>
+              <select id="contrato-metodo" data-testid="contrato-metodo">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="contrato-ruta">Ruta</label>
+              <input id="contrato-ruta" type="text" value="/salud" spellcheck="false" data-testid="contrato-ruta">
+            </div>
+            <button type="button" class="boton" data-testid="btn-contrato">Enviar petición</button>
+          </div>
+          <div class="campo">
+            <label for="contrato-cuerpo">Cuerpo JSON (solo POST)</label>
+            <textarea id="contrato-cuerpo" rows="4" spellcheck="false" disabled data-testid="contrato-cuerpo"></textarea>
+          </div>
+          <div class="contrato__respuesta">
+            <div class="contrato__meta">
+              <span class="chip" data-testid="contrato-estado" data-estado="neutro">Sin enviar</span>
+              <span class="chip" data-testid="contrato-latencia">Latencia: —</span>
+            </div>
+            <pre class="codigo" data-testid="contrato-json">Selecciona una ruta y pulsa «Enviar petición».</pre>
+          </div>
+        </section>
+
+        <!-- 3. Pruebas de valores límite -->
+        <section class="tarjeta" aria-labelledby="titulo-bva">
+          <h2 id="titulo-bva" class="tarjeta__titulo"><span class="paso">3</span> Valores límite (BVA) en vivo</h2>
+          <p class="ayuda">
+            La batería ataca la API real con los bordes de 2.0 y 3.0 y con datos inválidos.
+            Los valores esperados salen de las reglas del negocio, no de la respuesta del servidor:
+            así la prueba puede fallar si el cálculo se rompe.
+          </p>
+          <div class="acciones">
+            <button type="button" class="boton" data-testid="btn-bva">Ejecutar batería (11 casos)</button>
+            <span class="chip" data-testid="bva-resumen" data-estado="neutro">Sin ejecutar</span>
+          </div>
+          <div class="tabla-desplazable">
+            <table class="tabla-tecnica" data-testid="tabla-bva">
+              <caption>Particiones y valores límite de <code>validar_nota</code> / <code>determinar_estado</code></caption>
+              <thead>
+                <tr>
+                  <th scope="col">Caso</th>
+                  <th scope="col">Notas (M1, M2, M3)</th>
+                  <th scope="col">Esperado</th>
+                  <th scope="col">Obtenido</th>
+                  <th scope="col">Resultado</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="nota">
+            <strong>Para explicar:</strong> 2.00 es <em>HABILITA</em> y 1.99 es <em>REPROBADO</em>;
+            3.00 es <em>APROBADO</em> y 2.99 es <em>HABILITA</em>. El paso de 0.01 es el mínimo
+            posible porque la definitiva se redondea a dos decimales.
+          </p>
+        </section>
+
+        <!-- 4. Laboratorio de carga -->
+        <section class="tarjeta" aria-labelledby="titulo-carga">
+          <h2 id="titulo-carga" class="tarjeta__titulo"><span class="paso">4</span> Laboratorio de carga</h2>
+          <p class="ayuda">
+            Lanza Locust dentro del contenedor <code>carga</code> contra la API, igual que
+            <code>.github/workflows/carga.yml</code>. Cuando termina, informa RPS, p95 y fallos,
+            y marca si se cumplen los umbrales: menos del 1 % de errores y p95 ≤ 800 ms.
+          </p>
+          <div class="contrato__formulario">
+            <div class="campo campo--angosto">
+              <label for="carga-usuarios">Usuarios</label>
+              <input id="carga-usuarios" type="number" min="5" max="200" step="5" value="50" data-testid="carga-usuarios">
+            </div>
+            <div class="campo campo--angosto">
+              <label for="carga-duracion">Duración (s)</label>
+              <input id="carga-duracion" type="number" min="10" max="60" step="5" value="20" data-testid="carga-duracion">
+            </div>
+            <button type="button" class="boton" data-testid="btn-carga">Ejecutar prueba de carga</button>
+          </div>
+          <p class="mensaje" data-testid="mensaje-carga" role="status" aria-live="polite" hidden></p>
+
+          <div class="carga__progreso" data-testid="carga-progreso" hidden>
+            <div class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="barra__relleno"></div>
+            </div>
+            <p class="carga__estado" data-testid="carga-estado">Preparando la corrida…</p>
+          </div>
+
+          <div class="veredicto" data-testid="carga-veredicto" hidden></div>
+
+          <div class="kpis" data-testid="carga-resultado" hidden>
+            <article class="kpi"><span class="kpi__valor" data-testid="kpi-peticiones">—</span><span class="kpi__etiqueta">Peticiones</span></article>
+            <article class="kpi"><span class="kpi__valor" data-testid="kpi-rps">—</span><span class="kpi__etiqueta">RPS</span></article>
+            <article class="kpi"><span class="kpi__valor" data-testid="kpi-p95">—</span><span class="kpi__etiqueta">p95 (ms)</span></article>
+            <article class="kpi"><span class="kpi__valor" data-testid="kpi-media">—</span><span class="kpi__etiqueta">Media (ms)</span></article>
+            <article class="kpi"><span class="kpi__valor" data-testid="kpi-fallos">—</span><span class="kpi__etiqueta">Fallos</span></article>
+          </div>
+
+          <figure class="figura" data-testid="figura-carga" hidden>
+            <canvas class="grafico" height="240" aria-label="Evolución de RPS y p95 durante la prueba"></canvas>
+            <figcaption>RPS (azul) y p95 en milisegundos (naranja) segundo a segundo.</figcaption>
+          </figure>
+
+          <div class="tabla-desplazable" data-testid="tabla-carga-contenedor" hidden>
+            <table class="tabla-tecnica" data-testid="tabla-carga-endpoints">
+              <caption>Detalle por operación</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Método</th>
+                  <th scope="col">Ruta</th>
+                  <th scope="col">Peticiones</th>
+                  <th scope="col">Fallos</th>
+                  <th scope="col">Media (ms)</th>
+                  <th scope="col">p95 (ms)</th>
+                  <th scope="col">Máx. (ms)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="rejilla-doble">
+          <!-- 5. Mapa de pruebas -->
+          <section class="tarjeta" aria-labelledby="titulo-mapa">
+            <h2 id="titulo-mapa" class="tarjeta__titulo"><span class="paso">5</span> Mapa de pruebas</h2>
+            <table class="tabla-tecnica">
+              <caption>Qué demuestra cada nivel de la pirámide</caption>
+              <thead>
+                <tr><th scope="col">Nivel</th><th scope="col">Archivo</th><th scope="col">Qué demuestra</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Unitarias</td><td><code>tests/unit/</code></td><td>Pesos, redondeo, límites y excepciones sin HTTP.</td></tr>
+                <tr><td>API</td><td><code>tests/api/</code></td><td>Contrato, códigos 200/201/400/404 y JSON Schema.</td></tr>
+                <tr><td>Extremo a extremo</td><td><code>tests/e2e/</code></td><td>Navegador → Nginx → Gunicorn → S3 con Playwright.</td></tr>
+                <tr><td>Carga</td><td><code>load/locustfile.py</code></td><td>RPS, p95 y punto de quiebre con 100 usuarios.</td></tr>
+                <tr><td>Integración continua</td><td><code>.github/workflows/</code></td><td>Cada push repite todo y frena el merge si falla.</td></tr>
+              </tbody>
+            </table>
+            <p class="nota">
+              Cobertura actual del backend: <strong>95.65 %</strong> (mínimo exigido 80 % en
+              <code>pytest.ini</code>).
+            </p>
+          </section>
+
+          <!-- 6. Decisiones técnicas -->
+          <section class="tarjeta" aria-labelledby="titulo-decisiones">
+            <h2 id="titulo-decisiones" class="tarjeta__titulo"><span class="paso">6</span> Decisiones técnicas</h2>
+            <dl class="decisiones">
+              <dt>¿Por qué Nginx delante de la API?</dt>
+              <dd>Sirve el frontend y reenvía <code>/api</code>; el navegador no necesita CORS ni conocer el puerto interno.</dd>
+              <dt>¿Por qué Gunicorn y no <code>flask run</code>?</dt>
+              <dd>El servidor de desarrollo cerraba conexiones a partir de 800 usuarios. Gunicorn atiende en un proceso con hilos.</dd>
+              <dt>¿Por qué <code>127.0.0.1</code> y no <code>localhost</code>?</dt>
+              <dd>En macOS AirPlay ocupa el puerto 5000 y responde 403 a <code>localhost</code>.</dd>
+              <dt>¿Dónde se pierde el estado?</dt>
+              <dd>Los estudiantes viven en un diccionario en memoria: al reiniciar la API se pierden. El CSV en S3 es la persistencia del reporte.</dd>
+              <dt>¿Por qué 80 % de cobertura?</dt>
+              <dd>Es el mínimo de <code>pytest.ini</code>: obliga a cubrir ramas de error, no solo el camino feliz.</dd>
+            </dl>
+          </section>
+        </div>
+      </div>
     </section>
   </main>
 
   <footer class="pie">
     <p>Notas válidas de 0.0 a 5.0 · Reprobado &lt; 2.0 · Habilita 2.0 – 2.99 · Aprobado ≥ 3.0</p>
+    <p class="pie__fino">Panel técnico: arquitectura, contrato, BVA y carga sobre la API real.</p>
   </footer>
 </body>
 </html>
