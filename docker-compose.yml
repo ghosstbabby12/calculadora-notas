@@ -1,6 +1,6 @@
 services:
   localstack:
-    image: localstack/localstack:4.0.3
+    image: localstack/localstack:3.8.1
     environment:
       SERVICES: s3
     ports:
@@ -10,14 +10,10 @@ services:
       interval: 3s
       timeout: 5s
       retries: 30
-    networks:
-      - notas-net
-
   api:
     build: .
     image: calculadora-notas:local
-    # Prepara el bucket de Persona A antes de arrancar Flask.
-    command: ["sh", "-ec", "python -m infra.setup_aws && exec python -m app.main"]
+    command: ["sh", "-ec", "python -m infra.setup_aws && exec python -m flask --app app.main run --host=0.0.0.0 --port=5000"]
     environment: &aws
       AWS_ENDPOINT_URL: http://localstack:4566
       AWS_ACCESS_KEY_ID: test
@@ -33,12 +29,6 @@ services:
       interval: 3s
       timeout: 5s
       retries: 30
-    networks:
-      - notas-net
-
-  # Ejecuta las pruebas de API contra el servicio `api`.
-  # Uso: docker compose up --build --abort-on-container-exit --exit-code-from test-runner
-  # --no-cov: la cobertura se mide en unit (test_client), aquí solo se valida el contrato.
   test-runner:
     image: calculadora-notas:local
     depends_on:
@@ -47,11 +37,4 @@ services:
     environment:
       <<: *aws
       API_URL: http://api:5000
-      API_BASE_URL: http://api:5000
-    command: ["pytest", "tests/api", "-p", "no:cacheprovider", "--no-cov", "-v"]
-    networks:
-      - notas-net
-
-networks:
-  notas-net:
-    driver: bridge
+    command: ["pytest", "tests/api", "-p", "no:cacheprovider", "--no-cov"]
