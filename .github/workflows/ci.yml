@@ -54,3 +54,35 @@ jobs:
       - run: docker compose up --build --abort-on-container-exit --exit-code-from test-runner
       - if: always()
         run: docker compose down -v
+  e2e:
+    needs: pruebas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      # --wait espera a que api y frontend pasen su healthcheck (frontend verifica /api/salud).
+      - name: Levantar API y frontend
+        run: docker compose up -d --build --wait frontend
+      - name: Instalar Playwright
+        run: |
+          pip install -r requirements.txt -r tests/e2e/requirements.txt
+          playwright install --with-deps chromium
+      - name: Pruebas E2E
+        env:
+          FRONTEND_URL: http://localhost:8080
+        run: pytest -m e2e --no-cov --screenshot only-on-failure --output test-results
+      - name: Subir capturas de las pruebas fallidas
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas-e2e
+          path: test-results/
+          if-no-files-found: ignore
+      - name: Logs de los contenedores
+        if: failure()
+        run: docker compose logs api frontend
+      - if: always()
+        run: docker compose down -v
