@@ -5,3 +5,4 @@ requests==2.32.3
 jsonschema==4.23.0
 locust==2.31.8
 boto3==1.35.36
+gunicorn==23.0.0
