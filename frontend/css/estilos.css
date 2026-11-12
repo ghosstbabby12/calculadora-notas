@@ -887,6 +887,16 @@ textarea:focus-visible {
 .medidor__tick {
   position: absolute;
   transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* Los extremos se alinean hacia dentro para no salir de la tarjeta. */
+.medidor__tick:first-child {
+  transform: none;
+}
+
+.medidor__tick:last-child {
+  transform: translateX(-100%);
 }
 
 /* --- Pie ---------------------------------------------------------------------- */
