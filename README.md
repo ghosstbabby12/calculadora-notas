@@ -58,7 +58,7 @@ En `docker-compose.yml`, `image` fija la versión de LocalStack y da nombre a la
 
 ## SonarQube Cloud en los pull requests
 
-1. Abre el [proyecto del grupo](https://sonarcloud.io/dashboard?id=ghosstbabby12_calculadora-notas). En Administration → Analysis Method selecciona GitHub Actions y desactiva Automatic Analysis. La aplicación de SonarQube Cloud debe tener acceso al repositorio en GitHub.
+1. Abre el [proyecto del grupo](https://sonarcloud.io/dashboard?id=calculadora-notas). En Administration → Analysis Method selecciona GitHub Actions y desactiva Automatic Analysis. La aplicación de SonarQube Cloud debe tener acceso al repositorio en GitHub.
 2. Una persona con permiso de análisis genera un token en Sonar. Un administrador lo guarda en GitHub → Settings → Secrets and variables → Actions → New repository secret, con nombre `SONAR_TOKEN`. El valor se guarda únicamente como secreto.
 3. `sonar-project.properties` identifica el proyecto y la organización, indica el origen de código y cobertura y espera el resultado del Quality Gate. Para iniciar la línea base, ejecuta CI sobre main una vez que esa rama contenga el workflow. Para el primer PR, si Sonar exige una línea base previa, analiza primero el commit actual de main con el escáner y las mismas claves.
 4. Abre un PR desde una rama del repositorio hacia main y revisa Checks → sonar. Un Quality Gate fallido deja el check en rojo. En los PR de forks el job `sonar` se omite, porque el secreto no está disponible. Tras ejecutar el flujo por primera vez, en Settings → Rules → Rulesets protege main, exige PR con una aprobación y los checks `pruebas`, `api` y `sonar`.
