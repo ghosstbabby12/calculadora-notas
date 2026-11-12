@@ -42,6 +42,45 @@ Se repitió la corrida con niveles crecientes (incorporación de 50 usuarios por
 - El límite no lo pone la lógica de notas sino el servidor de desarrollo de Flask, de un solo proceso: entre 600 y 800 usuarios concurrentes empieza a cerrar conexiones. Para producción habría que servir la app con un servidor WSGI multihilo o multiproceso (por ejemplo Gunicorn) y, sobre todo, sacar el estado de la memoria del proceso.
 - Los números corresponden a una laptop con Docker Desktop, donde la red del contenedor y el reenvío de puertos agregan latencia; en un runner de GitHub Actions los valores pueden variar, pero el orden de magnitud y el punto de quiebre deberían mantenerse.
 
+## Prueba de estrés con Gunicorn
+
+**Fecha:** 2026-11-11, 22:48–22:54 (America/Bogota)
+**Commit:** `56452f6` (main, después del PR #4 que sirve la API con Gunicorn: 1 worker y 8 hilos)
+**Entorno:** el mismo MacBook Air M4 con Docker Desktop. Locust 2.31.8 en un solo proceso.
+
+La prueba de carga responde «¿cumple con la carga esperada?». La de estrés responde «¿hasta dónde aguanta y se recupera?». `load/estres.py` reutiliza el mismo usuario y los mismos umbrales (1 % de errores, p95 de 800 ms). Sube por escalones de 30 s, incorporando 200 usuarios por segundo. Mide cada escalón por separado y se detiene en el primero que incumple. Al final baja a 50 usuarios durante 30 s para comprobar la recuperación.
+
+| Fase | Usuarios | Peticiones | RPS | Media (ms) | p95 (ms) | Fallos (%) | ¿Roto? |
+|---|---|---|---|---|---|---|---|
+| subida | 100 | 1737 | 57.7 | 14.6 | 74 | 0.12 | no |
+| subida | 250 | 4150 | 137.9 | 8.3 | 10 | 0.07 | no |
+| subida | 500 | 8097 | 269.4 | 6.7 | 16 | 0.06 | no |
+| subida | 1000 | 16057 | 534.2 | 6.5 | 28 | 0.08 | no |
+| subida | 1500 | 23571 | 784.4 | 5.7 | 13 | 0.06 | no |
+| subida | 2000 | 31053 | 1033.7 | 5.6 | 20 | 0.03 | no |
+| subida | 3000 | 46424 | 1542.0 | 11.4 | 88 | 0.04 | no |
+| subida | 4000 | 61284 | 2037.1 | 13.6 | 77 | 0.03 | no |
+| subida | 5000* | 76106 | 2509.1 | 30.2 | 170 | 0.05 | no |
+| recuperación | 50 | 2722 | 90.2 | 16.8 | 120 | 0.00 | no |
+
+\* En el escalón de 5000 usuarios Locust avisó «CPU usage above 90 %». El generador de carga, no la API, fue el cuello de botella. Por eso ese escalón no se considera una medición válida de la API.
+
+**Punto de quiebre: no alcanzado.** Con Gunicorn la API sostuvo 4000 usuarios (unos 2000 RPS) con un p95 de 77 ms y un 0.03 % de fallos. Con el servidor de desarrollo de Flask se rompía entre 600 y 800 usuarios. La latencia empieza a crecer desde 3000 usuarios (la media pasa de unos 6 ms a 11–14 ms), pero sigue lejos de los 800 ms. Para encontrar el quiebre real hace falta un generador más potente: Locust distribuido en varias máquinas o un runner con más CPU.
+
+**Recuperación:** al bajar a 50 usuarios no hubo fallos. El p95 de 120 ms refleja la cola que quedaba del escalón anterior en los primeros segundos.
+
+**Errores residuales:** en todos los escalones aparece entre 0.03 % y 0.12 % de `RemoteDisconnected`. Ese porcentaje no crece con la carga: con 100 usuarios es igual o mayor que con 4000. Esto indica que no es saturación de la API. Se probó subir `--keep-alive` de Gunicorn a 5 s y los errores se mantuvieron, por lo que se descartó esa causa y se revirtió el cambio. La hipótesis restante es el reenvío de puertos de Docker Desktop en macOS. Queda muy por debajo del umbral del 1 %.
+
+### Reproducir la prueba de estrés
+
+```sh
+docker compose up -d --build --wait api
+locust -f load/estres.py --host http://127.0.0.1:5000 --headless \
+  --html reporte-estres.html --csv resultados_estres
+```
+
+No se pasan `-u`, `-r` ni `-t`: la clase `EstresEscalonado` define la forma de la carga. El resumen por escalón queda en `resultados_estres_escalones.csv`. No se usa `--processes`: combinado con la forma de carga personalizada, el proceso maestro dejó de responder.
+
 ## Reproducir
 
 ```sh
