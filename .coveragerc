@@ -1,3 +1,7 @@
 [run]
 relative_files = True
-source = app,infra
+# Rutas relativas a la raíz del repo (app/..., infra/...) para que Sonar
+# no confunda app/__init__.py con infra/__init__.py.
+include =
+    app/*
+    infra/*
