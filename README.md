@@ -13,6 +13,14 @@ curl http://127.0.0.1:5000/salud
 
 Usa `127.0.0.1` y no `localhost`: en macOS el Receptor de AirPlay ocupa el puerto 5000 y responde 403 a `localhost`, aunque el contenedor esté sano. Si el puerto sigue ocupado, exporta `PUERTO_API=5050` antes de `docker compose` y usa `http://127.0.0.1:5050` en las URLs.
 
+Para levantar también la interfaz web:
+
+```sh
+docker compose up -d --build --wait frontend
+```
+
+Abre http://127.0.0.1:8080. La pestaña **Panel técnico** reúne, para la sustentación, la arquitectura y latencia de los servicios, un explorador del contrato HTTP, una batería de valores límite ejecutada contra la API real y un laboratorio que lanza Locust y muestra RPS, p95 y fallos con los mismos umbrales del pipeline.
+
 En PowerShell se puede usar `curl.exe` para la consulta. Para ejecutar las pruebas HTTP desde cero:
 
 ```sh
@@ -35,6 +43,8 @@ Usa el id devuelto al crear el estudiante. Volver a enviar notas reemplaza las t
 - `app/calculadora.py` valida números de 0 a 5, aplica los pesos 30/30/40 y redondea a dos decimales antes de clasificar. `tests/unit/test_calculadora.py` muestra las particiones por tipo y rango. Los casos 1.99/2.00/2.01 y 2.99/3.00/3.01 comprueban los cambios de estado. Los extremos 0 y 5 son válidos y -0.1 y 5.1 quedan fuera.
 - `app/main.py` expone las cinco rutas. Un bloqueo protege el diccionario cuando llegan peticiones simultáneas. `tests/unit/test_main.py` verifica que una actualización inválida conserve las notas anteriores y simula fallos de S3.
 - `app/reportes.py` genera el CSV en UTF-8. `infra/setup_aws.py` prepara el bucket antes de iniciar Flask. Sus pruebas unitarias usan clientes simulados.
+- `frontend/` sirve la interfaz con Nginx y reenvía `/api` a la API y `/carga` al ejecutor de pruebas. `index.html` tiene las vistas de operación y técnica; `js/api.js` concentra las peticiones, `js/ui.js` el DOM, `js/tecnico.js` el panel y `js/graficos.js` el medidor y el gráfico en canvas.
+- `load/servidor.py` es el servicio que ejecuta Locust a pedido del panel: valida usuarios y duración, permite una sola corrida y devuelve las métricas de los CSV. `load/ejecutar_locust.py` baja el volcado de estadísticas a un segundo para que el gráfico tenga la corrida completa.
 - `tests/api/schemas.py` define campos y tipos permitidos. `tests/api/test_api.py` usa HTTP real, comprueba el límite de 500 ms por petición y recupera el objeto de S3 para contrastarlo con el promedio.
 - `requirements.txt` fija dependencias. `pytest.ini` exige 80 % de cobertura y genera HTML y XML. `.coveragerc` permite que Sonar ubique los archivos con rutas relativas. Los archivos `__init__.py` identifican los paquetes de Python.
 
@@ -71,7 +81,7 @@ En `docker-compose.yml`, `image` fija la versión de LocalStack y da nombre a la
 En los tres YAML, `on` define el evento, `runs-on` selecciona la máquina y `steps` enumera comandos y acciones. `needs` exige que termine otro job correctamente. `secrets` permite inyectar credenciales durante el paso que las utiliza.
 
 - `.github/workflows/ci.yml` prueba cada push y PR. Publica cobertura en el artefacto **cobertura**, ejecuta Compose y analiza los PR y main con Sonar. El checkout del análisis descarga el historial completo.
-- `load/locustfile.py` crea un estudiante por usuario, registra notas y alterna consultas y escrituras con pesos 5:1. Agrupa rutas por operación. Antes de medir consulta `/salud` y aborta con un mensaje claro si el puerto no apunta a la API. `tests/unit/test_carga.py` comprueba ese chequeo y los umbrales. `.github/workflows/carga.yml` ejecuta 100 usuarios con una incorporación de 10 por segundo durante un minuto en pushes a main o desde Actions → Pruebas de carga → Run workflow. Falla por encima del 1 % de errores o de 800 ms en p95. Guarda el HTML y CSV en **reporte-carga**.
+- `load/locustfile.py` crea un estudiante por usuario, registra notas y alterna consultas y escrituras con pesos 5:1. Agrupa rutas por operación. Antes de medir consulta `/salud` y aborta con un mensaje claro si el puerto no apunta a la API. `tests/unit/test_carga.py` comprueba ese chequeo y los umbrales. `.github/workflows/carga.yml` ejecuta 100 usuarios con una incorporación de 10 por segundo durante un minuto en pushes a main o desde Actions → Pruebas de carga → Run workflow. Falla por encima del 1 % de errores o de 800 ms en p95. Guarda el HTML y CSV en **reporte-carga**. El mismo contenedor `carga` alimenta el laboratorio del panel técnico, que no se publica fuera del proxy.
 - `.github/workflows/cd.yml` recibe la finalización exitosa del CI de un push a main. Usa el token de GitHub con permiso de escritura en paquetes, publica en GHCR con el SHA y prueba la imagen publicada en /salud. Promueve la revisión vigente a staging tras el humo. Si el humo falla, repone la etiqueta previa cuando existe. En la primera publicación fallida no hay versión anterior. La publicación deja una imagen en el registro.
 
 Para la demostración interactiva, levanta la API, activa el entorno Python e inicia `locust -f load/locustfile.py --host http://127.0.0.1:5000`. Abre http://127.0.0.1:8089. Para documentar resultados utiliza `load/informe.md`.
