@@ -33,7 +33,7 @@ Se repitió la corrida con niveles crecientes (incorporación de 50 usuarios por
 | 600 | 30 s | 8360 | 284.1 | 55.3 | 270 | 0.00 |
 | 800 | 30 s | 9101 | 313.3 | 107.9 | 770 | **54.32** |
 
-**Punto de quiebre: entre 600 y 800 usuarios.** El primer nivel que incumple es 800: el p95 (770 ms) todavía entra en el umbral, pero el 54 % de las peticiones falla. El error dominante es `RemoteDisconnected: Remote end closed connection without response` en las tres rutas, es decir, conexiones cerradas por el servidor: el servidor de desarrollo de Werkzeug agota su capacidad de aceptar conexiones antes de que la latencia supere los 800 ms. Alrededor del 4 % de las consultas también devolvió 404 porque el alta del estudiante había fallado antes.
+**Punto de quiebre: entre 600 y 800 usuarios.** El primer nivel que incumple es 800: el p95 (770 ms) todavía entra en el umbral, pero el 54 % de las peticiones falla. El error dominante es `RemoteDisconnected: Remote end closed connection without response` en las tres rutas, es decir, conexiones cerradas por el servidor: el servidor de desarrollo de Werkzeug agota su capacidad de aceptar conexiones antes de que la latencia supere los 800 ms. Alrededor del 3 % de las consultas también devolvió 404 porque el alta del estudiante había fallado antes.
 
 ## Conclusiones
 
