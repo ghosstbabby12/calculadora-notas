@@ -30,6 +30,22 @@ services:
       interval: 3s
       timeout: 5s
       retries: 30
+  carga:
+    # Ejecuta Locust a pedido del panel técnico. No publica puerto: solo lo
+    # alcanza Nginx por la red interna.
+    build: .
+    image: calculadora-notas:local
+    command: ["gunicorn", "--bind", "0.0.0.0:5001", "--workers", "1", "--threads", "4", "load.servidor:app"]
+    environment:
+      API_INTERNA: http://api:5000
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5001/salud', timeout=2)"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
   frontend:
     build: ./frontend
     image: calculadora-notas-frontend:local
@@ -37,8 +53,10 @@ services:
       # PUERTO_FRONTEND permite cambiar el 8080 si ya está ocupado.
       - "127.0.0.1:${PUERTO_FRONTEND:-8080}:80"
     depends_on:
-      # Nginx resuelve el nombre "api" al arrancar: la API debe estar lista.
+      # Nginx resuelve los nombres "api" y "carga" al arrancar: deben estar listos.
       api:
+        condition: service_healthy
+      carga:
         condition: service_healthy
     healthcheck:
       # Verifica la página Y el proxy inverso en una sola consulta.
