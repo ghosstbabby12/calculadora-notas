@@ -1,0 +1,414 @@
+/* ==========================================================================
+   Variables de diseño (paleta institucional y estados)
+   ========================================================================== */
+:root {
+  --color-primario: #1f3a68;
+  --color-primario-oscuro: #152a4d;
+  --color-acento: #2f6fb3;
+  --color-fondo: #f3f5f9;
+  --color-superficie: #ffffff;
+  --color-texto: #1d2433;
+  --color-texto-suave: #5b6476;
+  --color-borde: #d4d9e3;
+
+  --color-aprobado: #1e7a46;
+  --color-aprobado-fondo: #e3f4ea;
+  --color-habilita: #8a5a00;
+  --color-habilita-fondo: #fff3d6;
+  --color-reprobado: #b42318;
+  --color-reprobado-fondo: #fde8e6;
+  --color-info: #1f3a68;
+  --color-info-fondo: #e6edf8;
+
+  --radio: 10px;
+  --sombra: 0 1px 2px rgb(16 24 40 / 6%), 0 2px 8px rgb(16 24 40 / 6%);
+  --espacio: 1rem;
+  --fuente: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fuente);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-texto);
+  background: var(--color-fondo);
+}
+
+h1, h2, h3 {
+  line-height: 1.25;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Encabezado
+   ========================================================================== */
+.encabezado {
+  background: var(--color-primario);
+  color: #fff;
+  padding: 1.25rem var(--espacio);
+}
+
+.encabezado__contenido {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.encabezado__titulo {
+  font-size: 1.5rem;
+}
+
+.encabezado__subtitulo {
+  margin: 0.25rem 0 0;
+  opacity: 0.85;
+  font-size: 0.9rem;
+}
+
+.estado-servidor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 12%);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.estado-servidor__punto {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: #c3c9d4;
+}
+
+.estado-servidor[data-estado="en-linea"] .estado-servidor__punto {
+  background: #4ade80;
+}
+
+.estado-servidor[data-estado="fuera-de-linea"] .estado-servidor__punto {
+  background: #f87171;
+}
+
+/* ==========================================================================
+   Distribución
+   ========================================================================== */
+.contenedor {
+  max-width: 1100px;
+  margin: 1.5rem auto;
+  padding: 0 var(--espacio);
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+  align-items: start;
+}
+
+.tarjeta {
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 1.25rem;
+}
+
+.tarjeta__titulo {
+  font-size: 1.15rem;
+  color: var(--color-primario);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.paso {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--color-info-fondo);
+  color: var(--color-primario);
+  font-size: 0.9rem;
+}
+
+.subtitulo {
+  font-size: 0.95rem;
+  margin: 1.25rem 0 0.5rem;
+  color: var(--color-texto-suave);
+}
+
+.ayuda,
+.vacio {
+  color: var(--color-texto-suave);
+  font-size: 0.9rem;
+  margin: 0 0 0.75rem;
+}
+
+/* ==========================================================================
+   Formularios
+   ========================================================================== */
+.formulario {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.formulario--en-linea {
+  grid-template-columns: 1fr auto;
+  align-items: end;
+}
+
+.fila-notas {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.campo {
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+}
+
+.campo label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.campo small {
+  font-weight: 400;
+  color: var(--color-texto-suave);
+}
+
+input,
+select {
+  font: inherit;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--color-texto);
+}
+
+input:focus-visible,
+select:focus-visible,
+.boton:focus-visible {
+  outline: 3px solid var(--color-acento);
+  outline-offset: 2px;
+}
+
+input[aria-invalid="true"] {
+  border-color: var(--color-reprobado);
+  background: var(--color-reprobado-fondo);
+}
+
+.error-campo {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-reprobado);
+}
+
+.boton {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.6rem 1.1rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-primario);
+  color: #fff;
+  cursor: pointer;
+  justify-self: start;
+}
+
+.boton:hover {
+  background: var(--color-primario-oscuro);
+}
+
+.boton--secundario {
+  background: var(--color-acento);
+}
+
+.boton:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* ==========================================================================
+   Mensajes
+   ========================================================================== */
+.mensaje {
+  margin: 0.85rem 0 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  border-left: 4px solid currentcolor;
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
+
+.mensaje--exito {
+  color: var(--color-aprobado);
+  background: var(--color-aprobado-fondo);
+}
+
+.mensaje--error {
+  color: var(--color-reprobado);
+  background: var(--color-reprobado-fondo);
+}
+
+.mensaje--info {
+  color: var(--color-info);
+  background: var(--color-info-fondo);
+}
+
+/* ==========================================================================
+   Lista de estudiantes
+   ========================================================================== */
+.lista-estudiantes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.lista-estudiantes li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  font-size: 0.92rem;
+}
+
+.lista-estudiantes__id {
+  font-weight: 700;
+  color: var(--color-primario);
+}
+
+/* ==========================================================================
+   Tarjeta de resultado
+   ========================================================================== */
+.resultado {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-borde);
+  border-left: 6px solid var(--color-borde);
+  border-radius: var(--radio);
+}
+
+.resultado__encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.resultado__nombre {
+  font-size: 1.1rem;
+}
+
+.resultado__definitiva {
+  font-size: 1.05rem;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.resultado__definitiva strong {
+  font-size: 1.4rem;
+}
+
+.insignia {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.resultado--aprobado { border-left-color: var(--color-aprobado); }
+.resultado--habilita { border-left-color: var(--color-habilita); }
+.resultado--reprobado { border-left-color: var(--color-reprobado); }
+
+.resultado--aprobado .insignia { color: var(--color-aprobado); background: var(--color-aprobado-fondo); }
+.resultado--habilita .insignia { color: var(--color-habilita); background: var(--color-habilita-fondo); }
+.resultado--reprobado .insignia { color: var(--color-reprobado); background: var(--color-reprobado-fondo); }
+
+.desglose {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.desglose caption {
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-texto-suave);
+  padding-bottom: 0.35rem;
+}
+
+.desglose th,
+.desglose td {
+  white-space: nowrap;
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px solid var(--color-borde);
+  text-align: left;
+}
+
+.desglose td:not(:first-child),
+.desglose thead th:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.desglose tfoot th {
+  white-space: normal;
+}
+
+.desglose tfoot th,
+.desglose tfoot td {
+  font-weight: 700;
+  border-bottom: none;
+}
+
+/* ==========================================================================
+   Pie y adaptación a celular
+   ========================================================================== */
+.pie {
+  text-align: center;
+  color: var(--color-texto-suave);
+  font-size: 0.85rem;
+  padding: 1rem var(--espacio) 2rem;
+}
+
+@media (max-width: 520px) {
+  .fila-notas {
+    grid-template-columns: 1fr;
+  }
+
+  .formulario--en-linea {
+    grid-template-columns: 1fr;
+  }
+
+  .boton {
+    justify-self: stretch;
+  }
+}

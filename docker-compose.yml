@@ -30,6 +30,22 @@ services:
       interval: 3s
       timeout: 5s
       retries: 30
+  frontend:
+    build: ./frontend
+    image: calculadora-notas-frontend:local
+    ports:
+      # PUERTO_FRONTEND permite cambiar el 8080 si ya está ocupado.
+      - "127.0.0.1:${PUERTO_FRONTEND:-8080}:80"
+    depends_on:
+      # Nginx resuelve el nombre "api" al arrancar: la API debe estar lista.
+      api:
+        condition: service_healthy
+    healthcheck:
+      # Verifica la página Y el proxy inverso en una sola consulta.
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/api/salud"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
   test-runner:
     image: calculadora-notas:local
     depends_on:
