@@ -8,8 +8,10 @@ Desde la raíz, con Docker Desktop o Docker Engine y Compose v2:
 
 ```sh
 docker compose up -d --build --wait api
-curl http://localhost:5000/salud
+curl http://127.0.0.1:5000/salud
 ```
+
+Usa `127.0.0.1` y no `localhost`: en macOS el Receptor de AirPlay ocupa el puerto 5000 y responde 403 a `localhost`, aunque el contenedor esté sano. Si el puerto sigue ocupado, exporta `PUERTO_API=5050` antes de `docker compose` y usa `http://127.0.0.1:5050` en las URLs.
 
 En PowerShell se puede usar `curl.exe` para la consulta. Para ejecutar las pruebas HTTP desde cero:
 
@@ -59,7 +61,7 @@ En `docker-compose.yml`, `image` fija la versión de LocalStack y da nombre a la
 1. Abre el [proyecto del grupo](https://sonarcloud.io/dashboard?id=ghosstbabby12_calculadora-notas). En Administration → Analysis Method selecciona GitHub Actions y desactiva Automatic Analysis. La aplicación de SonarQube Cloud debe tener acceso al repositorio en GitHub.
 2. Una persona con permiso de análisis genera un token en Sonar. Un administrador lo guarda en GitHub → Settings → Secrets and variables → Actions → New repository secret, con nombre `SONAR_TOKEN`. El valor se guarda únicamente como secreto.
 3. `sonar-project.properties` identifica el proyecto y la organización, indica el origen de código y cobertura y espera el resultado del Quality Gate. Para iniciar la línea base, ejecuta CI sobre main una vez que esa rama contenga el workflow. Para el primer PR, si Sonar exige una línea base previa, analiza primero el commit actual de main con el escáner y las mismas claves.
-4. Abre un PR desde una rama del repositorio hacia main y revisa Checks → sonar. Un Quality Gate fallido deja el check en rojo. Los PR de forks no reciben el secreto. Tras ejecutar el flujo por primera vez, en Settings → Rules → Rulesets protege main, exige PR con una aprobación y los checks `pruebas`, `api` y `sonar`.
+4. Abre un PR desde una rama del repositorio hacia main y revisa Checks → sonar. Un Quality Gate fallido deja el check en rojo. En los PR de forks el job `sonar` se omite, porque el secreto no está disponible. Tras ejecutar el flujo por primera vez, en Settings → Rules → Rulesets protege main, exige PR con una aprobación y los checks `pruebas`, `api` y `sonar`.
 5. Si falla el análisis, abre el paso “SonarQube Cloud Quality Gate”. Comprueba secreto, organización, clave, permisos y que exista un análisis de main. Tras corregir la configuración vuelve a ejecutar los jobs fallidos del PR.
 
 [Documentación oficial de Sonar para GitHub Actions](https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/ci-based-analysis/github-actions-for-sonarcloud)
@@ -69,7 +71,7 @@ En `docker-compose.yml`, `image` fija la versión de LocalStack y da nombre a la
 En los tres YAML, `on` define el evento, `runs-on` selecciona la máquina y `steps` enumera comandos y acciones. `needs` exige que termine otro job correctamente. `secrets` permite inyectar credenciales durante el paso que las utiliza.
 
 - `.github/workflows/ci.yml` prueba cada push y PR. Publica cobertura en el artefacto **cobertura**, ejecuta Compose y analiza los PR y main con Sonar. El checkout del análisis descarga el historial completo.
-- `load/locustfile.py` crea un estudiante por usuario, registra notas y alterna consultas y escrituras con pesos 5:1. Agrupa rutas por operación. `.github/workflows/carga.yml` ejecuta 100 usuarios con una incorporación de 10 por segundo durante un minuto en pushes a main o desde Actions → Pruebas de carga → Run workflow. Falla por encima del 1 % de errores o de 800 ms en p95. Guarda el HTML y CSV en **reporte-carga**.
+- `load/locustfile.py` crea un estudiante por usuario, registra notas y alterna consultas y escrituras con pesos 5:1. Agrupa rutas por operación. Antes de medir consulta `/salud` y aborta con un mensaje claro si el puerto no apunta a la API. `tests/unit/test_carga.py` comprueba ese chequeo y los umbrales. `.github/workflows/carga.yml` ejecuta 100 usuarios con una incorporación de 10 por segundo durante un minuto en pushes a main o desde Actions → Pruebas de carga → Run workflow. Falla por encima del 1 % de errores o de 800 ms en p95. Guarda el HTML y CSV en **reporte-carga**.
 - `.github/workflows/cd.yml` recibe la finalización exitosa del CI de un push a main. Usa el token de GitHub con permiso de escritura en paquetes, publica en GHCR con el SHA y prueba la imagen publicada en /salud. Promueve la revisión vigente a staging tras el humo. Si el humo falla, repone la etiqueta previa cuando existe. En la primera publicación fallida no hay versión anterior. La publicación deja una imagen en el registro.
 
-Para la demostración interactiva, levanta la API, activa el entorno Python e inicia `locust -f load/locustfile.py --host http://localhost:5000`. Abre http://localhost:8089. Para documentar resultados utiliza `load/informe.md`.
+Para la demostración interactiva, levanta la API, activa el entorno Python e inicia `locust -f load/locustfile.py --host http://127.0.0.1:5000`. Abre http://127.0.0.1:8089. Para documentar resultados utiliza `load/informe.md`.

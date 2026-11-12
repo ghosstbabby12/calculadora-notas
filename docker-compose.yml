@@ -20,7 +20,8 @@ services:
       AWS_SECRET_ACCESS_KEY: test
       AWS_DEFAULT_REGION: us-east-1
     ports:
-      - "127.0.0.1:5000:5000"
+      # PUERTO_API permite evitar el 5000, que en macOS ocupa AirPlay.
+      - "127.0.0.1:${PUERTO_API:-5000}:5000"
     depends_on:
       localstack:
         condition: service_healthy
